@@ -7,7 +7,7 @@ import Text from "./Text";
 function App() {
   return (
     <>
-      <Box text="네모짱" />
+      <Box />
       <Circle text="동그라미짱" />
       <Button backgroundColor="pink" borderRadius="10px" />
       <Text content="타입스크립트 뭐이리 어렵냐" color="blue" />
