@@ -1,39 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import Agreement from "./subcomponents/agreement/Agreement";
+import Agreement, { AgreementProps } from "./subcomponents/agreement/Agreement";
 import Next from "./subcomponents/Next/Next";
+import RoundChecker from "./subcomponents/agreement/checkers/RoundChecker";
+import TitleInstruction from "./subcomponents/agreement/instructions/TitleInstruction";
 
-type Agreement = { isMandantory: boolean; isChecked: boolean };
+type Agreement = { isMandantory: boolean } & AgreementProps;
 
 const Register = () => {
   const [agreements, setAgreement] = useState<Agreement[]>([
-    { isMandantory: false, isChecked: false },
-    { isMandantory: true, isChecked: false },
-    { isMandantory: false, isChecked: false },
-    { isMandantory: false, isChecked: false },
+    { isMandantory: false, isChecked: false, handleClick: () => handleClickTest(0), Instruction: "만 14세 이상입니다." },
+    { isMandantory: true, isChecked: false, handleClick: () => handleClickTest(1), Instruction: "이용약관, 개인정보 수집/이용", required: "mandantory" },
+    { isMandantory: false, isChecked: false, handleClick: () => handleClickTest(2), Instruction: "위치 기반 서비스 이용", required: "option" },
+    { isMandantory: false, isChecked: false, handleClick: () => handleClickTest(3), Instruction: "홍보성 정보 수신", required: "option" },
   ]);
 
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-  const handleClick = () => setIsChecked((prev) => !prev);
+  const handleClickAll = () =>
+    setAgreement((prev) => {
+      const isAlltrue = agreements.every((v) => v.isChecked);
+      const newPrev = [...prev].map((v) => ({ ...v, isChecked: isAlltrue ? false : true }));
+      return newPrev;
+    });
 
-  const [isChecked1, setIsChecked1] = useState<boolean>(false);
-  const handleClick1 = () => setIsChecked1((prev) => !prev);
+  const handleClickTest = (num: number) => {
+    setAgreement((prev) => [...prev].map((v, i) => (num == i ? { ...v, isChecked: !v.isChecked } : v)));
+  };
 
-  const [isChecked2, setIsChecked2] = useState<boolean>(false);
-  const handleClick2 = () => setIsChecked2((prev) => !prev);
-
-  const [isChecked3, setIsChecked3] = useState<boolean>(false);
-  const handleClick3 = () => setIsChecked3((prev) => !prev);
+  const agreementsData: AgreementProps[] = [
+    { isChecked: agreements[0].isChecked, handleClick: () => handleClickTest(0), Instruction: "만 14세 이상입니다." },
+    { isChecked: agreements[1].isChecked, handleClick: () => handleClickTest(1), Instruction: "이용약관, 개인정보 수집/이용", required: "mandantory" },
+    { isChecked: agreements[2].isChecked, handleClick: () => handleClickTest(2), Instruction: "위치 기반 서비스 이용", required: "option" },
+    { isChecked: agreements[3].isChecked, handleClick: () => handleClickTest(3), Instruction: "홍보성 정보 수신", required: "option" },
+  ];
 
   return (
     <div>
-      회원등록
-      <Agreement isChecked={isChecked} handleClick={handleClick} Instruction='만 14세 이상입니다.' />
-      <Agreement isChecked={isChecked1} handleClick={handleClick1} required='mandantory' Instruction='이용약관, 개인정보 수집/이용' />
-      <Agreement isChecked={isChecked2} handleClick={handleClick2} required='option' Instruction='위치 기반 서비스 이용' />
-      <Agreement isChecked={isChecked3} handleClick={handleClick3} required='option' Instruction='홍보성 정보 수신' />
-      <Next isPass={isChecked1} />
+      <div className='flex gap-1'>
+        <RoundChecker isChecked={agreements.every((v) => v.isChecked)} handleClick={() => handleClickAll()} />
+        <TitleInstruction Instruction='전체 동의' />
+      </div>
+      {agreementsData.map((v, i) => (
+        <Agreement key={i} {...v} />
+      ))}
+
+      {/* <Agreement isChecked={agreements[0].isChecked} handleClick={() => handleClickTest(0)} Instruction='만 14세 이상입니다.' />
+      <Agreement isChecked={agreements[1].isChecked} handleClick={() => handleClickTest(1)} required='mandantory' Instruction='이용약관, 개인정보 수집/이용' />
+      <Agreement isChecked={agreements[2].isChecked} handleClick={() => handleClickTest(2)} required='option' Instruction='위치 기반 서비스 이용' />
+      <Agreement isChecked={agreements[3].isChecked} handleClick={() => handleClickTest(3)} required='option' Instruction='홍보성 정보 수신' /> */}
+      <Next isPass={agreements.every((v) => (v.isMandantory ? v.isChecked : true))} />
     </div>
   );
 };
